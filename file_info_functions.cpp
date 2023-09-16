@@ -22,9 +22,9 @@ vector<FileInfo> readData(const string& file_name) {
 
 void printFileInfo(const vector<FileInfo>& file_info) {
     for (const FileInfo& file : file_info) {
-        cout << "\nÍàçâàíèå ôàéëà: " << file.name_file;
-        cout << "\nÄàòà: " << file.data.year << "." << file.data.month << "." << file.data.day;
-        cout << "\nÐàçìåð: " << file.file_size;
+        cout << "\nÐÐ°Ð·Ð²Ð°Ð½Ð¸Ðµ Ñ„Ð°Ð¹Ð»Ð°: " << file.name_file;
+        cout << "\nÐ”Ð°Ñ‚Ð°: " << file.data.year << "." << file.data.month << "." << file.data.day;
+        cout << "\nÐ Ð°Ð·Ð¼ÐµÑ€: " << file.file_size;
         cout << "\n";
     }
 }
