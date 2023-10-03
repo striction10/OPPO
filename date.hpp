@@ -8,3 +8,5 @@ struct Date {
     int month;
     int day;
 };
+
+void printDate(const Date& data);
