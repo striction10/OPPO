@@ -10,3 +10,6 @@ struct FileInfo {
     Date data;
     int file_size;
 };
+
+void printLayoutFileInfo(const FileInfo& file);
+void printFileInfo(const vector<FileInfo>& fileinfo);
