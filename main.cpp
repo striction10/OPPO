@@ -1,13 +1,16 @@
-#include "FileUntils.hpp"
+#include <iostream>
+#include <fstream>
+#include "FileInfo.hpp"
 
 int main() {
     setlocale(LC_ALL, "");
-    string file_name = "test.txt";
-    ifstream input(file_name);
-    if (!input.is_open()) {
+    ifstream input("test.txt");
+    if (!input) {
         cout << "Не удалось открыть файл" << endl;
+        return 0;
     }
     vector<FileInfo> file_info = readData(input);
     printFileInfo(file_info);
+    input.close();
     return 0;
 }
