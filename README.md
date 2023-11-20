@@ -4,4 +4,4 @@
 Файлы: название файла (строка), дата создания, размер (целое число байт).  
 Style Code: Google Style C++
 # Class Diagram
-https://www.plantuml.com/plantuml/png/dL5TIiD047xFAUP9KcLFe4YB8WZgYmSes-maNTZioiv4gALtTwP9HLUemPU4pFUJxvjP4jlCGn-g9bWYkBUC-mh0c1Lpzfk1aOoHmRxr6Dm1Z8yCExIvdFKfyhOSEhixcZqZRvERd7hz4CRLU_8ECbfN4sSVEmW-ukBwD-TDKAuNqAH8_1FVf1J0a-Q-IpbZmxKu7AOw3pxWOspJ-KhJtwFjSTsAuZkcng2FifeIr-G_y5n1YPFopUX_2ntoAdVqLrlTo8jaqV1pk9fk3a_zNYNmNAukxaauzN7jCAek_dEaKQhzlteL3jf1SNsNcDWgT8e_thSw9JJcKaNL4gCR-l09
+![image](https://github.com/striction10/OPPO/assets/120221293/edda2a4e-fc82-4965-8de6-1a40e973fdf8)
