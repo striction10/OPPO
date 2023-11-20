@@ -2,154 +2,90 @@
 #include "..\..\ProjectCPP\ProjectCPP\date.cpp"
 #include "..\..\ProjectCPP\ProjectCPP\FileInfo.cpp"
 
-TEST(TestEmptyDate)
-{
-	EXPECT_THROW(
-	{
-		Date date;
-		date.read(istringstream(""));
-	},
-	std::runtime_error);
-}
 
-TEST(TestInvalidDate1)
+TEST(TestInvalidDates)
 {
-	EXPECT_THROW(
+	vector<string> invalidDates{ "", "01.01.01.2000", "10.0.2000", "28.13.2020", "32.10.2023", "01*12*2000", "01 12 2000" };
+	for (auto invalidDate : invalidDates)
 	{
-		Date date;
-		date.read(istringstream("01.01.01.2000"));
-	},
-	std::runtime_error);
-}
-
-TEST(TestInvalidDate2)
-{
-	EXPECT_THROW(
-	{
-		Date date;
-		date.read(istringstream("10.0.2000"));
-	},
-	std::runtime_error);
-}
-
-TEST(TestInvalidDate3)
-{
-	EXPECT_THROW(
-	{
-		Date date;
-		date.read(istringstream("28.13.2020"));
-	},
-	std::runtime_error);
-}
-
-TEST(TestInvalidDate4)
-{
-	EXPECT_THROW(
-	{
-		Date date;
-		date.read(istringstream("32.10.2023"));
-	},
-	std::runtime_error);
-}
-
-TEST(TestInvalidDate5)
-{
-	EXPECT_THROW(
+		EXPECT_THROW(
 		{
 			Date date;
-			date.read(istringstream("0.10.2023"));
+			date.read(invalidDate);
 		},
 		std::runtime_error);
+	}
 }
 
-TEST(TestInvalidDate6)
+TEST(TestValidDates)
 {
-	EXPECT_THROW(
-		{
-			Date date;
-			date.read(istringstream("a.b.2023"));
-		},
-		std::runtime_error);
-}
-
-TEST(TestValidDate1)
-{
-	Date date;
-	date.read(istringstream("01.01.2000"));
-	EXPECT_EQ(date.isDateCorrect(), true);
-}
-
-TEST(TestValidDate2)
-{
-	Date date;
-	date.read(istringstream("09.09.2023"));
-	EXPECT_EQ(date.isDateCorrect(), true);
-}
-
-TEST(TestValidDate3)
-{
-	Date date;
-	date.read(istringstream("29.02.2022"));
-	EXPECT_EQ(date.isDateCorrect(), true);
-}
-
-TEST(TestInvalidFileNameRead1)
-{
-	EXPECT_THROW(
+	vector<string> validDates{ "01.01.2000", "09.09.2023", "28.02.2022", "10.12.2019", "01.12.2000" };
+	for (auto validDate : validDates)
 	{
-		FileInfo file_info;
-		file_info.readNameFile(istringstream("tes?t.txt 28.02.2002 555"));
-	},
-	std::runtime_error);
+		Date date;
+		date.read(validDate);
+		EXPECT_EQ(date.isDateCorrect(), true);
+	}
 }
 
-TEST(TestInvalidFileNameRead2)
+TEST(TestInvalidFileNames)
 {
-	EXPECT_THROW(
+	vector<string> invalidFileNames{ "\"test.txt 28.02.2002 5", "te\"st.txt 28.02.2002 35", "*test*.txt 28.02.2002 15", "test.txt\" 28.02.2002 5" };
+	for (auto invalidFileName : invalidFileNames)
 	{
-		FileInfo file_info;
-		file_info.readNameFile(istringstream("te\"st.txt 28.02.2002 555"));
-	},
-	std::runtime_error);
-}
-
-TEST(TestInvalidFileNameRead3)
-{
-	EXPECT_THROW(
-	{
-		FileInfo file_info;
-		file_info.readNameFile(istringstream("*test*.txt 28.02.2002 555"));
-	},
-	std::runtime_error);
-}
-
-TEST(TestInvalidFileNameRead4)
-{
-	EXPECT_THROW(
+		EXPECT_THROW(
 		{
 			FileInfo file_info;
-			file_info.readNameFile(istringstream("tes/t.txt 28.02.2002 555"));
+			file_info.readNameFile(invalidFileName);
 		},
 		std::runtime_error);
+	}
 }
 
-TEST(TestValidFileNameRead1)
+TEST(TestValidFileNames)
 {
-	FileInfo file_info;
-	file_info.readNameFile(istringstream("test.txt 28.02.2002 555"));
-	EXPECT_EQ(file_info.name_file, "test.txt");
+	vector<string> validFileNames{ "test  2.txt", "TEST_123.txt", "999super_file_name999.txt" };
+	for (auto validFileName : validFileNames)
+	{
+		FileInfo file_info;
+		file_info.readNameFile(validFileName);
+		EXPECT_EQ(file_info.get_name_file(), validFileName);
+	}
 }
 
-TEST(TestValidFileNameRead2)
+TEST(TestInvalidFileSizes)
 {
-	FileInfo file_info;
-	file_info.readNameFile(istringstream("TEST_123.txt 28.02.2002 555"));
-	EXPECT_EQ(file_info.name_file, "TEST_123.txt");
+	vector<string> invalidFileSizes{ "-500", "1,24", "255.30" };
+	for (auto invalidFileSize : invalidFileSizes)
+	{
+		EXPECT_THROW(
+		{
+			FileInfo file_info;
+			file_info.readFileSize(invalidFileSize);
+		},
+		std::runtime_error);
+	}
 }
 
-TEST(TestValidFileNameRead3)
+TEST(ValidFileSizes)
+{
+	vector<string> validFileSizes{ "500", "999", "10000"};
+	for (auto validFileSize : validFileSizes)
+	{
+		FileInfo file_info;
+		file_info.readFileSize(validFileSize);
+		EXPECT_EQ(file_info.get_file_size(), stoi(validFileSize));
+	}
+}
+
+TEST(PrintLayoutFileInfo)
 {
 	FileInfo file_info;
-	file_info.readNameFile(istringstream("999super_file_name999.txt 29.02.2002 555"));
-	EXPECT_EQ(file_info.name_file, "999super_file_name999.txt");
+	file_info.readNameFile("Test.txt");
+	file_info.readDate("10.11.2023");
+	file_info.readFileSize("500");
+
+	std::ostringstream out;
+	file_info.printLayoutFileInfo(out);
+	EXPECT_EQ(out.str(), "\nFile name: Test.txt\nDate: 2023.11.10\nWeight: 500\n");
 }
