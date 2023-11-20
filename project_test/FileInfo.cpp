@@ -1,69 +1,104 @@
 #include "FileInfo.hpp"
 
-inline bool space(char c) {
-    return c == ' ';
-}
-
-inline bool notspace(char c) {
-    return c != ' ';
-}
-
-vector<string> splitBySpace(const string& s) {
-    typedef string::const_iterator iter;
-    vector<string> ret;
-    iter i = s.begin();
-    while (i != s.end()) {
-        i = find_if(i, s.end(), notspace);
-        iter j = find_if(i, s.end(), space);
-        if (i != s.end()) {
-            ret.push_back(string(i, j));
-            i = j;
-        }
-    }
-    return ret;
-}
-
-void FileInfo::readNameFile(istringstream& file) {
-    file >> name_file;
+void FileInfo::readNameFile(string line) {
+    name_file = line;
 
     string forbidden_strs[] = { "/", "\\", "?", ":", "*", "\"", "<", ">", "|"};
     for (auto forbidden_str: forbidden_strs)
     {
         if (name_file.find(forbidden_str) != std::string::npos)
-            throw runtime_error("Обнаружен запрещенный символ " + forbidden_str + " в названии файла: " + file.str());
+            throw runtime_error("Found forbidden char " + forbidden_str + " of file name in line: " + line);
     }
 }
 
-void FileInfo::readDate(istringstream& file) {
-    date.read(file);
+void FileInfo::readDate(string line) {
+    date.read(line);
 }
 
-void FileInfo::readFileSize(istringstream& file) {
-    file >> file_size;
+void FileInfo::readFileSize(string line) {
+    for (char const& c : line)
+    {   
+        int count = 0;
+        const string digit = "0123456789";
+        for (int i = 0; i < 10; i++) {
+            char temp = digit[i];
+            if (c == temp) {
+                count++;
+            }
+        }
+        if (count == 0) {
+            throw runtime_error("File size format is wrong! Should be integer.");
+        }
+    }
+    file_size = stoi(line);
+    if (file_size < 0)
+        throw runtime_error("File size could not be negative!");
+}
+
+vector<string> FileInfo::getArgs(string line) {
+    if (line.empty())
+        throw runtime_error("Line is empty!");
+
+    vector<string> args;
+    char quote = '\"';
+    if (line[0] != quote)
+        throw runtime_error("File name format is wrong! It should be in double quotes.");
+
+    int nextQuoteIndex = line.substr(1, line.size() - 2).find(quote) + 1;
+    if (nextQuoteIndex == string::npos)
+        throw runtime_error("File name format is wrong! Couldn't find second double quote.");
+
+    string file_name = line.substr(1, nextQuoteIndex - 1);
+    args.push_back(file_name);
+
+    int dateStartIndex = nextQuoteIndex + 2;
+    int nextSpaceIndex = line.substr(dateStartIndex, line.size() - dateStartIndex).find(' ');
+    if (nextSpaceIndex == string::npos)
+        throw runtime_error("File name format is wrong! Couldn't find space.");
+
+    string date = line.substr(dateStartIndex, 10);
+
+    int sizeStartIndex = dateStartIndex + 11;
+    if (sizeStartIndex >= line.size())
+        throw runtime_error("File name format is wrong! Couldn't find size arg.");
+
+     string size = line.substr(sizeStartIndex, line.size() - sizeStartIndex);
+
+    args.push_back(date);
+    args.push_back(size);
+
+    return args;
 }
 
 void FileInfo::readFileInfoLine(const string& line) {
-    vector<string> strs = splitBySpace(line);
-
-
-//    if (strs.size() != 3)
-  //      throw runtime_error("Количество недопустимых аргументов (должно быть 3). Строка: " + line);
+    vector<string> args = getArgs(line);
 
     istringstream iss(line);
-    readNameFile(iss);
-    readDate(iss);
-    readFileSize(iss);
+    readNameFile(args[0]);
+    readDate(args[1]);
+    readFileSize(args[2]);
 }
 
-void FileInfo::printLayoutFileInfo() const {
-    cout << "\nНазвание файла: " << name_file;
-    cout << "\nДата: ";
-    date.print();
-    cout << "\nРазмер: " << file_size;
-    cout << "\n";
+void FileInfo::printLayoutFileInfo(std::ostream& out = std::cout) const {
+    out << "\nFile name: " << name_file;
+    out << "\nDate: " << date.year << "." << date.month << "." << date.day;
+    out << "\nWeight: " << file_size;
+    out << "\n";
 }
 
-vector<FileInfo> readData(ifstream& input) {
+string FileInfo::get_name_file() {
+    return name_file;
+}
+
+int FileInfo::get_file_size() {
+    return file_size;
+}
+
+Date FileInfo::get_date() {
+    return date;
+}
+
+vector<FileInfo> readData(istream& input) {
     vector<FileInfo> file_info;
     string line;
     while (getline(input, line)) {
