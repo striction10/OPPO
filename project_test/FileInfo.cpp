@@ -1,17 +1,22 @@
 #include "FileInfo.hpp"
+#include <algorithm>
+#include <vld.h>
 
-void FileInfo::readNameFile(string line) {
+void FileInfo::readNameFile(const string& line) {
     name_file = line;
 
-    string forbidden_strs[] = { "/", "\\", "?", ":", "*", "\"", "<", ">", "|"};
-    for (auto forbidden_str: forbidden_strs)
-    {
-        if (name_file.find(forbidden_str) != std::string::npos)
-            throw runtime_error("Found forbidden char " + forbidden_str + " of file name in line: " + line);
+    const string forbidden_strs[] = { "/", "\\", "?", ":", "*", "\"", "<", ">", "|" };
+    auto found_forbidden = std::find_if(std::begin(forbidden_strs), std::end(forbidden_strs),
+        [this](const string& forbidden_str) {
+            return name_file.find(forbidden_str) != std::string::npos;
+        });
+
+    if (found_forbidden != std::end(forbidden_strs)) {
+        throw std::runtime_error("Found forbidden char " + *found_forbidden + " of file name in line: " + line);
     }
 }
 
-void FileInfo::readDate(string line) {
+void FileInfo::readDate(const string& line) {
     date.read(line);
 }
 
@@ -56,7 +61,7 @@ vector<string> FileInfo::getArgs(string line) {
     if (nextSpaceIndex == string::npos)
         throw runtime_error("File name format is wrong! Couldn't find space.");
 
-    string date = line.substr(dateStartIndex, 10);
+    string date_temp = line.substr(dateStartIndex, 10);
 
     int sizeStartIndex = dateStartIndex + 11;
     if (sizeStartIndex >= line.size())
@@ -64,7 +69,7 @@ vector<string> FileInfo::getArgs(string line) {
 
      string size = line.substr(sizeStartIndex, line.size() - sizeStartIndex);
 
-    args.push_back(date);
+    args.push_back(date_temp);
     args.push_back(size);
 
     return args;
