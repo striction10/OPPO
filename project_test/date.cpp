@@ -1,5 +1,6 @@
 #include "date.hpp"
 #include <vector>
+#include <vld.h>
 
 inline bool dot(char c) {
     return c == '.';
@@ -14,7 +15,7 @@ vector<string> splitDate(const string& s) {
     vector<string> ret;
     iter i = s.begin();
     while (i != s.end()) {
-        i = find_if(i, s.end(), notdot); // 1277.
+        i = find_if(i, s.end(), notdot);
         iter j = find_if(i, s.end(), dot);
         if (i != s.end()) {
             ret.push_back(string(i, j));
@@ -25,33 +26,31 @@ vector<string> splitDate(const string& s) {
 }
 
 bool Date::isDateCorrect() {
-	if (year < 1 || month < 1 || month > 12 || day < 1 || day > 31)
-		return false;
-
-	if (day > 31 && (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12))
+    if (year < 1 || month < 1 || month > 12 || day < 1)
         return false;
 
-	if (day > 30 && (month == 4 || month == 6 || month == 9 || month == 11))
-		return false;
-
-    if (day > 29 && (month == 2 && year % 4 == 0 && year % 100 != 0))
-        return false;
-
-    if (day > 28 && (month == 2 && year % 4 == 0 && year % 100 != 0))
-        return false;
-
-	return true;
+    if (month == 4 || month == 6 || month == 9 || month == 11) {
+        return day <= 30;
+    }
+    else if (month == 2) {
+        if (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)) {
+            return day <= 29;
+        }
+        else {
+            return day <= 28;
+        }
+    }
+    else {
+        return day <= 31;
+    }
 }
+void Date::read(const string& line) {
+    if (line.empty())
+        throw runtime_error("Р—Р°РґР°РЅРЅР°СЏ СЃС‚СЂРѕРєР° РїСѓСЃС‚Р°");
 
-void Date::read(istringstream& iss) {
-    string buf;
-    iss >> buf;
-    if (buf.empty())
-        throw runtime_error("Строка даты пуста");
-
-    vector<string> splitted = splitDate(buf);
+    vector<string> splitted = splitDate(line);
     if (splitted.size() != 3)
-        throw runtime_error("Строка " + buf + " не соответствует формату даты");
+        throw runtime_error("РЎС‚СЂРѕРєР° " + line + " РЅРµ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ С„РѕСЂРјР°С‚Сѓ РґР°С‚С‹");
 
     try
     {
@@ -61,11 +60,11 @@ void Date::read(istringstream& iss) {
     }
     catch (std::invalid_argument)
     {
-        throw runtime_error("Строка " + buf + " имеет неправильный формат");
+        throw runtime_error("РЎС‚СЂРѕРєР° " + line + " РёРјРµРµС‚ РЅРµРїСЂР°РІРёР»СЊРЅС‹Р№ С„РѕСЂРјР°С‚");
     }
 
     if (!isDateCorrect())
-        throw runtime_error("Заданная дата " + buf + " не существует");
+        throw runtime_error("Р—Р°РґР°РЅРЅР°СЏ РґР°С‚Р° " + line + " РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚");
 }
 
 void Date::print() const {
