@@ -15,8 +15,8 @@ private:
     int file_size;
 public:
     vector<string> getArgs(string line);
-    void readNameFile(string line);
-    void readDate(string line);
+    void readNameFile(const string& line);
+    void readDate(const string& line);
     void readFileSize(string line);
     void readFileInfoLine(const string& line);
     void printLayoutFileInfo(std::ostream& out) const;
