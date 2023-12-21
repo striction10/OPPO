@@ -11,9 +11,7 @@ public:
     int month;
     int day;
 
-    void read(istringstream& file);
+    void read(const string& line);
     void print() const;
     bool isDateCorrect();
 };
-
-// vector<string> splitDatebydot(const string& s); // 12.12.12 12 12 12
